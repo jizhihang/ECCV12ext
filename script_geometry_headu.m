@@ -124,3 +124,37 @@ for f=1:size(map{1},1)
     unlock([lockBase '.lock']);
 end
 end    
+
+bestI = 40;
+
+weightY = weights(weightYI(bestI)); 
+weightP = weights(weightPI(bestI));
+weightA = areaWeights(weightAI(bestI));
+resultDirectory = ['results' num2str(weightY) '_' num2str(weightP) '_' num2str(weightA) '/'];
+
+n = size(map{1}, 1);
+old = cell(n, 1);
+new = cell(n, 1);
+for i = 1 : n    
+    filename=fullfile('../dataset/hedauOutput/',[map{1}{i} '_layres.mat']);
+    load(filename, 'polyg');
+    
+    filename=fullfile(resultDirectory, map{1}{i}, 'new01Ind.txt');
+    if ~exist(filename, 'file')
+        new{i} = cell(1, 5);
+    else 
+        ii = load(filename);
+        new{i} = polyg(ii, :);
+    end   
+    
+    filename=fullfile(resultDirectory, map{1}{i}, 'old01Ind.txt');
+    if ~exist(filename, 'file')
+        old{i} = cell(1, 5);
+    else 
+        ii = load(filename);
+        old{i} = polyg(ii, :);
+    end 
+end
+
+aold = evalScore(map, old)
+anew = evalScore(map, new)
