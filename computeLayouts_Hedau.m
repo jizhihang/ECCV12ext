@@ -56,9 +56,8 @@ gridDistance = diff(D);
 gridDistance = [gridDistance(1,:); gridDistance];
 gridArea = gridDistance .^ 2;
 
-
 n = numel(ii);
-maxScore = max(vv); minScore = min(vv); scoreRange = maxScore - minScore;
+maxScore = max(vv); minScore = min(vv); 
 polygonScores = zeros(n, 1);
 for i=1:n
     polygonScores(ii(i)) = vv(i);
