@@ -1,16 +1,25 @@
 function accuracy = evalScore(map, poly)
     accuracy = 0;
     n = size(map{1}, 1);
+    nvalid = 0;
     for i = 1 : n
+        if isempty(poly{i})
+            continue;
+        end
+        nvalid = nvalid + 1;
+        
+        img = imread(sprintf('../dataset/images/%s.jpg', map{1}{i}));
         gt = imread(sprintf('../dataset/gt/%s.png', map{1}{i}));
         
-        [h, w] = size(gt);
-        layout = getLayout(poly{i}, w, h);
+        [h, w, d] = size(img);
+        [gth, gtw] = size(gt);
+        layout = imresize(getLayout(poly{i}, w, h), [gth gtw], 'nearest');
         
-        I = double(gt ~= 0);
+        I = double(gt >= 1 & gt <= 5);
+        nvalidgt = length(find(I));
         match = (layout == gt) .* I;
-        acc = length(find(match)) / length(find(I));
-        
+        acc = length(find(match)) / nvalidgt;
+               
         check_swap = 0;
         if isempty(poly{i}{3}) && ~isempty(poly{i}{4})
             p = poly{i};
@@ -27,9 +36,9 @@ function accuracy = evalScore(map, poly)
         end
             
         if check_swap
-            l = getLayout(p, w, h);
+            l = imresize(getLayout(p, w, h), [gth gtw], 'nearest');
             m = (l == gt) .* I;
-            a = length(find(m)) / length(find(I));
+            a = length(find(m)) / nvalidgt;
             if a > acc
                 acc = a;
                 match = m;
@@ -56,7 +65,7 @@ function accuracy = evalScore(map, poly)
             
             if check_swap
                 m = (layout == g) .* I;
-                a = length(find(m)) / length(find(I));
+                a = length(find(m)) / nvalidgt;
                 if a > acc
                     gt = g;
                     acc = a;
@@ -66,15 +75,16 @@ function accuracy = evalScore(map, poly)
         end               
 
         accuracy = accuracy + acc;
-        
-%         figure(1)
+%         fprintf('%s %0.2f\n', map{1}{i}, acc * 100);
+
+%         figure(1);
 %         imagesc(double(gt) + (double(gt == 0) * 6)); caxis([1, 6]);
-%         figure(2)
+%         figure(2);
 %         imagesc(layout); caxis([1, 6]);
-%         figure(3)
+%         figure(3);
 %         imagesc(match);
 %         pause
     end    
     
-    accuracy = accuracy / n;
+    accuracy = accuracy / nvalid;
 end

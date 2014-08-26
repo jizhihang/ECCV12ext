@@ -5,6 +5,7 @@ global camera_ht;
 filename=fullfile('../dataset/hedauOutput/',[imagename(1:end-4) '_layres.mat']);
 
 resultDirectory = ['results' num2str(weightY) '_' num2str(weightP) '_' num2str(weightA) '/'];
+%resultDirectory = ['results/'];
 
 mkdir(resultDirectory);
 mkdir([resultDirectory imagename(1:end-4)]);
@@ -56,8 +57,8 @@ gridDistance = diff(D);
 gridDistance = [gridDistance(1,:); gridDistance];
 gridArea = gridDistance .^ 2;
 
+
 n = numel(ii);
-maxScore = max(vv); minScore = min(vv); 
 polygonScores = zeros(n, 1);
 for i=1:n
     polygonScores(ii(i)) = vv(i);
@@ -94,8 +95,8 @@ fprintf('Reordering!\n');
 fprintf('Next best hypothesis (post-area): %d\n', ii(1));  
 
 
-figure(102);
-drawnow;
+%figure(102);
+%drawnow;
 for lay=1:min(numel(ii), 1)
     layoutid=ii(lay);
     Polyg=[];
@@ -106,10 +107,10 @@ for lay=1:min(numel(ii), 1)
         end
     end
     tempimg=displayout(Polyg,w,h,img);
-%    imwrite(uint8(tempimg), [resultDirectory imagename(1:end-4) '/new' num2str(lay,'%02d') '.jpg']);
+    imwrite(uint8(tempimg), [resultDirectory imagename(1:end-4) '/new' num2str(lay,'%02d') '.jpg']);
 
     tempimg2=displayblank(Polyg,w,h);
-%    imwrite(uint8(tempimg2), [resultDirectory imagename(1:end-4) '/newLabels' num2str(lay, '%02d') '.jpg']);
+    imwrite(uint8(tempimg2), [resultDirectory imagename(1:end-4) '/newLabels' num2str(lay, '%02d') '.jpg']);
 
     dlmwrite([resultDirectory imagename(1:end-4) '/new' num2str(lay, '%02d') 'Score.txt'], [vv(lay)], ' ');
     dlmwrite([resultDirectory imagename(1:end-4) '/new' num2str(lay, '%02d') 'Ind.txt'], [ii(lay)], ' ');
